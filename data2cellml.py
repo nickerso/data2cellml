@@ -2,7 +2,7 @@
 import sys
 import csv
 
-if len(sys.argv) < 7:
+if len(sys.argv) < 8:
     sys.exit("invalid arguments")
 
 filename = sys.argv[1]
@@ -11,6 +11,7 @@ valueColumn = int(sys.argv[3])
 timeUnits = sys.argv[4]
 unitsName = sys.argv[5]
 numberOfRepeats = int(sys.argv[6])
+every = int(sys.argv[7])
 
 offsetValues = False
 if len(sys.argv) > 6:
@@ -22,14 +23,18 @@ data = []
 with open(sys.argv[1], "r") as f:
     reader = csv.reader(f, delimiter=",")
     for i, line in enumerate(reader):
-        currentTime = float(line[timeColumn])
-        currentValue = float(line[valueColumn])
-        if i == 0:
-            offsetValue = currentTime
-        if offsetValues:
-            currentTime = currentTime - offsetValue
-        time.append(currentTime)
-        data.append(currentValue)
+        if i % every == 0:
+            try:
+                currentTime = float(line[timeColumn])
+                currentValue = float(line[valueColumn])
+                if i == 0:
+                    offsetValue = currentTime
+                if offsetValues:
+                    currentTime = currentTime - offsetValue
+                time.append(currentTime)
+                data.append(currentValue)
+            except ValueError:
+                break
 
 # handle repeats
 finalTime = time[-1]
